@@ -109,7 +109,7 @@
         </div>
         <section class="statement">
           <h2>Problem</h2>
-          ${p.statement}
+          ${mathHtml(p.statement)}
         </section>
         <section class="notes">
           <h2>Your setup</h2>
@@ -117,7 +117,7 @@
         </section>
         <section class="solution" data-solution>
           <h2>Solution</h2>
-          ${p.solution}
+          ${mathHtml(p.solution)}
         </section>
         <section class="viz">
           <div data-viz></div>
@@ -163,6 +163,14 @@
         save();
       }, 1000);
     };
+  }
+
+  function mathHtml(html) {
+    const swap = (body) => body.replace(/</g, "\\lt ").replace(/>/g, "\\gt ");
+    return String(html)
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_, body) => "\\(" + swap(body) + "\\)")
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_, body) => "\\[" + swap(body) + "\\]")
+      .replace(/\$\$([\s\S]*?)\$\$/g, (_, body) => "$$" + swap(body) + "$$");
   }
 
   function typeset(el) {

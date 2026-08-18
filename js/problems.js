@@ -73,20 +73,20 @@ window.PROBLEMS = [
     `,
     solution: String.raw`
       <h3>Setup</h3>
-      <p>Let the break points be \(U,V\sim\mathrm{Unif}[0,1]\) independent, and write \(0<X<Y<1\) for the ordered pair. The three lengths are the spacings</p>
+      <p>Let the break points be \(U,V\sim\mathrm{Unif}[0,1]\) independent, and write \(0 \lt X \lt Y \lt 1\) for the ordered pair. The three lengths are the spacings</p>
       \[
       A=X,\qquad B=Y-X,\qquad C=1-Y.
       \]
-      <p>The sample space of \((X,Y)\) is the triangle \(\{0<x<y<1\}\) of area \(1/2\). Equivalently, \((A,B,C)\) is uniform on the simplex \(A+B+C=1\), \(A,B,C>0\).</p>
+      <p>The sample space of \((X,Y)\) is the triangle \(\{0 \lt x \lt y \lt 1\}\) of area \(1/2\). Equivalently, \((A,B,C)\) is uniform on the simplex \(A+B+C=1\), \(A,B,C \gt 0\).</p>
 
       <h3>Triangle inequalities</h3>
       <p>Three positive lengths that sum to \(1\) form a triangle if and only if each is strictly less than \(1/2\):</p>
       \[
-      X<\tfrac12,\qquad Y-X<\tfrac12,\qquad 1-Y<\tfrac12.
+      X \lt \tfrac12,\qquad Y-X \lt \tfrac12,\qquad 1-Y \lt \tfrac12.
       \]
-      <p>The last is \(Y>1/2\). So the favorable set inside \(0<x<y<1\) is</p>
+      <p>The last is \(Y \gt 1/2\). So the favorable set inside \(0 \lt x \lt y \lt 1\) is</p>
       \[
-      x<\tfrac12<y,\qquad y-x<\tfrac12.
+      x \lt \tfrac12 \lt y,\qquad y-x \lt \tfrac12.
       \]
       <p>That region is itself a right triangle of legs \(1/2\), hence area \(1/8\).</p>
       \[
@@ -94,7 +94,7 @@ window.PROBLEMS = [
       \]
 
       <h3>Simplex picture</h3>
-      <p>On the equilateral 2-simplex, the set \(\{A,B,C<1/2\}\) is the central quarter: cutting off the three corners where one piece exceeds \(1/2\) removes three congruent triangles that together make three-quarters of the area.</p>
+      <p>On the equilateral 2-simplex, the set \(\{A,B,C \lt 1/2\}\) is the central quarter: cutting off the three corners where one piece exceeds \(1/2\) removes three congruent triangles that together make three-quarters of the area.</p>
 
       <div class="answer-box"><strong>Answer.</strong> \(1/4\).</div>
 
@@ -238,7 +238,7 @@ window.PROBLEMS = [
         <li><strong>Bonferroni / FWER</strong> for a confirmatory claim: a drug approval, a single published “effect exists” statement, anything where one false positive is the failure mode.</li>
         <li><strong>BH / FDR</strong> for large exploratory screens (genomics, feature ranking, many assets). You expect some false leads and want the list still mostly real.</li>
       </ul>
-      <p>Do not quote “we used \(p<0.05\)” on \(10{,}000\) tests. That is a machine for manufacturing 500 stories.</p>
+      <p>Do not quote “we used \(p \lt 0.05\)” on \(10{,}000\) tests. That is a machine for manufacturing 500 stories.</p>
     `,
     visual: "fdr"
   },
@@ -250,13 +250,13 @@ window.PROBLEMS = [
     title: "Uniform order-statistic means",
     blurb: "The k-th uniform order statistic is Beta. Its mean is the obvious spacing.",
     statement: String.raw`
-      <p>Let \(U_{(1)}<U_{(2)}<\cdots<U_{(n)}\) be the order statistics of \(n\) i.i.d. \(\mathrm{Uniform}[0,1]\) random variables. Find \(E[U_{(k)}]\) for general \(k\).</p>
+      <p>Let \(U_{(1)} \lt U_{(2)} \lt \cdots \lt U_{(n)}\) be the order statistics of \(n\) i.i.d. \(\mathrm{Uniform}[0,1]\) random variables. Find \(E[U_{(k)}]\) for general \(k\).</p>
     `,
     solution: String.raw`
       <h3>Distribution</h3>
-      <p>The joint density of the order statistics is \(n!\) on \(0<u_1<\cdots<u_n<1\). The marginal of \(U_{(k)}\) is \(\mathrm{Beta}(k,\,n-k+1)\):</p>
+      <p>The joint density of the order statistics is \(n!\) on \(0 \lt u_1 \lt \cdots \lt u_n \lt 1\). The marginal of \(U_{(k)}\) is \(\mathrm{Beta}(k,\,n-k+1)\):</p>
       \[
-      f_{U_{(k)}}(u) = \frac{n!}{(k-1)!(n-k)!}\, u^{k-1}(1-u)^{n-k}, \qquad 0<u<1.
+      f_{U_{(k)}}(u) = \frac{n!}{(k-1)!(n-k)!}\, u^{k-1}(1-u)^{n-k}, \qquad 0 \lt u \lt 1.
       \]
       <p>A Beta\((\alpha,\beta)\) random variable has mean \(\alpha/(\alpha+\beta)\), so</p>
       \[
