@@ -272,5 +272,55 @@ window.PROBLEMS = [
       <p>\(\mathrm{Var}(U_{(k)})=k(n-k+1)/[(n+1)^2(n+2)]\). The mid-range \(U_{((n+1)/2)}\) concentrates at \(1/2\) like \(n^{-1/2}\), while the extremes \(U_{(1)}\) and \(U_{(n)}\) live on the \(1/n\) scale. The figure lets you move \(n\) and \(k\) and watch the Beta density sit over \(k/(n+1)\).</p>
     `,
     visual: "orderstats"
+  },
+  {
+    id: "red-black",
+    num: "07",
+    topic: "Cards / money",
+    time: "12–15 min",
+    title: "Red-black even-money betting",
+    blurb: "A fair deck, even odds, start with $1. You can lock a fortune that grows like the square root of the deck.",
+    statement: String.raw`
+      <p>A deck has \(n\) red and \(n\) black cards, shuffled uniformly. You start with \(\$1\). Before each card is turned you may bet any amount of your current fortune on red or black at even odds: the stake is doubled if you are right and lost if you are wrong. Betting zero is allowed.</p>
+      <p>Find a strategy whose terminal fortune is the same for every shuffle, and compute that fortune. What is it for a 52-card deck (\(n=26\))?</p>
+    `,
+    solution: String.raw`
+      <h3>Setup</h3>
+      <p>There are exactly \(\binom{2n}{n}\) color sequences with \(n\) red and \(n\) black. After a prefix that leaves \(r\) red and \(b\) black still in the deck, the number of legal completions is \(\binom{r+b}{r}\).</p>
+      <p>Keep your fortune equal to the number of remaining completions, scaled so that you start at \(1\):</p>
+      \[
+      F(r,b) = 2^{2n-r-b}\,\frac{\binom{r+b}{r}}{\binom{2n}{n}}.
+      \]
+      <p>At the start, \(r=b=n\) and \(F=1\). At the end, \(r=b=0\) and every path has seen \(2n\) cards, so</p>
+      \[
+      F(0,0) = \frac{2^{2n}}{\binom{2n}{n}}.
+      \]
+      <p>That number does not depend on the order. The fortune is path-independent at the close.</p>
+
+      <h3>The bet that realises it</h3>
+      <p>Even money means a stake \(x\) on red sends \(F\mapsto F+x\) on red and \(F\mapsto F-x\) on black. Choose \(x\) so the two children are exactly \(F(r-1,b)\) and \(F(r,b-1)\). Pascal’s identity \(\binom{r+b}{r}=\binom{r+b-1}{r-1}+\binom{r+b-1}{r}\) makes this possible, and a short calculation gives</p>
+      \[
+      x = 2^{2n-r-b}\,\frac{\binom{r+b-1}{r-1}-\binom{r+b-1}{r}}{\binom{2n}{n}}.
+      \]
+      <p>If \(r=b\) then \(x=0\): you sit out. If \(r \gt b\) you bet on red; if \(b \gt r\) you bet on black. You only wager when the remaining deck is unbalanced, and you always back the majority color.</p>
+
+      <h3>Why you cannot guarantee more</h3>
+      <p>Any strategy is a martingale on a finite tree whose leaves are the \(\binom{2n}{n}\) balanced sequences. The average leaf fortune cannot exceed the start, once you account for the \(2^{2n}\) raw color-paths of which only the balanced ones occur. To make every balanced leaf at least \(c\), you need \(c\le 2^{2n}/\binom{2n}{n}\). The construction meets the bound, so it is optimal among guarantees.</p>
+
+      <h3>A full deck</h3>
+      <p>Stirling’s formula gives \(\binom{2n}{n}\sim 4^n/\sqrt{\pi n}\), hence</p>
+      \[
+      \frac{2^{2n}}{\binom{2n}{n}}\sim\sqrt{\pi n}.
+      \]
+      <p>For \(n=26\), \(\sqrt{26\pi}\approx 9.04\), and the exact value is \(2^{52}/\binom{52}{26}\approx 9.081\). From \(\$1\) you lock about nine dollars on a 52-card deck, with no variance at the end.</p>
+
+      <div class="answer-box">
+        <strong>Answer.</strong> Bet so that \(F(r,b)=2^{2n-r-b}\binom{r+b}{r}/\binom{2n}{n}\). Terminal fortune is always \(2^{2n}/\binom{2n}{n}\). For \(n=26\) that is \(2^{52}/\binom{52}{26}\approx 9.081\).
+      </div>
+
+      <h3>Interview hygiene</h3>
+      <p>The naive “bet a constant fraction” or “always bet on red” leaves you with a random fortune whose mean is \(1\). The point is a hedge across the remaining shuffles, not a directional view. The figure plays a small deck: sit out while \(r=b\), then ride the majority, and watch every shuffle end on the same number.</p>
+    `,
+    visual: "redblack"
   }
 ];

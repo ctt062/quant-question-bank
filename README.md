@@ -2,7 +2,7 @@
 
 A local study desk for later-round quant interview problems: probability, strategy, and statistics.
 
-The first set is six hard classics. Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
+The first set is seven hard classics. Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
 
 ## Run locally
 
@@ -24,6 +24,7 @@ The site is static HTML, CSS, and JavaScript. No build step.
 4. 100 prisoners
 5. Multiple testing: FWER vs FDR
 6. Uniform order-statistic expectations
+7. Red-black even-money betting
 
 Work each problem for 8-15 minutes before opening the solution.
 

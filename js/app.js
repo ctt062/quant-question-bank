@@ -50,11 +50,12 @@
       <section class="hero">
         <p class="kicker">Hard set · later rounds</p>
         <h1>Work the mechanism, then open the door.</h1>
-        <p class="lede">Six interview problems that reward a clean state space, a picture, and a sentence about why the answer is not the naive one. Time yourself. Write a setup before you reveal anything.</p>
+        <p class="lede">Seven interview problems that reward a clean state space, a picture, and a sentence about why the answer is not the naive one. Time yourself. Write a setup before you reveal anything.</p>
         <div class="meta-row">
           <span class="chip">Probability</span>
           <span class="chip">Geometric chance</span>
           <span class="chip">Strategy</span>
+          <span class="chip">Cards / money</span>
           <span class="chip">Inference</span>
           <span class="chip">8–15 min each</span>
         </div>
@@ -205,7 +206,7 @@
   window.addEventListener("hashchange", route);
   window.addEventListener("keydown", (ev) => {
     if (["INPUT", "TEXTAREA"].includes(ev.target.tagName)) return;
-    if (ev.key >= "1" && ev.key <= "6") {
+    if (ev.key >= "1" && ev.key <= "7") {
       location.hash = PROBLEMS[Number(ev.key) - 1].id;
     }
     if (ev.key === "h" || ev.key === "H") location.hash = "home";

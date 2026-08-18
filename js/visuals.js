@@ -1328,6 +1328,229 @@
       model.pdfTo = model.pdf;
       startLoop(draw);
       later(() => { dropSample(); }, 350);
+    },
+
+    redblack(root) {
+      root.innerHTML = `
+        <div class="viz-head">
+          <h3>Lock the same fortune</h3>
+          <div class="viz-controls">
+            <label class="stat">n <input type="range" min="2" max="8" value="5" data-n /> <span data-nv>5</span></label>
+            <button class="btn" data-act="flip">Flip one</button>
+            <button class="btn primary" data-act="play">Play the deck</button>
+            <button class="btn" data-act="reshuffle">New shuffle</button>
+            <span class="stat" data-stat></span>
+          </div>
+        </div>
+        <div class="viz-stage">
+          <canvas width="860" height="440"></canvas>
+        </div>
+        <p class="viz-caption">Bet only when remaining red and black are unequal, and always on the majority. Every shuffle of a given n ends at the same dollar amount.</p>
+      `;
+      const canvas = root.querySelector("canvas");
+      const ctx = canvas.getContext("2d");
+      const nInput = root.querySelector("[data-n]");
+      const nv = root.querySelector("[data-nv]");
+      const stat = root.querySelector("[data-stat]");
+      const model = {
+        n: 5,
+        deck: [],
+        i: 0,
+        r: 5,
+        b: 5,
+        F: 1,
+        displayF: 1,
+        path: [1],
+        flip: 0,
+        last: null,
+        busy: false,
+        chip: 0
+      };
+
+      function binom(n, k) {
+        if (k < 0 || k > n) return 0;
+        k = Math.min(k, n - k);
+        let v = 1;
+        for (let i = 1; i <= k; i += 1) v = v * (n - k + i) / i;
+        return v;
+      }
+
+      function fortune(n, r, b) {
+        return Math.pow(2, 2 * n - r - b) * binom(r + b, r) / binom(2 * n, n);
+      }
+
+      function target() {
+        return Math.pow(2, 2 * model.n) / binom(2 * model.n, model.n);
+      }
+
+      function stake(n, r, b) {
+        if (r + b <= 0) return { x: 0, color: null };
+        const x = Math.pow(2, 2 * n - r - b) * (binom(r + b - 1, r - 1) - binom(r + b - 1, r)) / binom(2 * n, n);
+        if (Math.abs(x) < 1e-12) return { x: 0, color: null };
+        return x > 0 ? { x, color: "R" } : { x: -x, color: "B" };
+      }
+
+      function shuffleDeck(n) {
+        const d = Array(n).fill("R").concat(Array(n).fill("B"));
+        for (let i = d.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [d[i], d[j]] = [d[j], d[i]];
+        }
+        return d;
+      }
+
+      function reset() {
+        model.n = Number(nInput.value);
+        nv.textContent = String(model.n);
+        model.deck = shuffleDeck(model.n);
+        model.i = 0;
+        model.r = model.n;
+        model.b = model.n;
+        model.F = 1;
+        model.displayF = 1;
+        model.path = [1];
+        model.flip = 0;
+        model.last = null;
+        model.chip = 0;
+      }
+
+      function drawCard(x, y, w, h, face, flip) {
+        const sy = Math.cos(flip * Math.PI);
+        ctx.save();
+        ctx.translate(x + w / 2, y + h / 2);
+        ctx.scale(Math.max(0.08, Math.abs(sy)), 1);
+        roundRect(ctx, -w / 2, -h / 2, w, h, 6);
+        if (sy >= 0) {
+          ctx.fillStyle = "#1b2333";
+          ctx.fill();
+          ctx.strokeStyle = "#d4b15a";
+          ctx.stroke();
+          ctx.fillStyle = "#d4b15a";
+          ctx.font = "700 16px 'Source Serif 4', serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Q", 0, 1);
+        } else {
+          ctx.fillStyle = face === "R" ? "#e07a6a" : "#1b2333";
+          ctx.fill();
+          ctx.strokeStyle = face === "R" ? "#f3efe4" : "#7aa2e3";
+          ctx.stroke();
+          ctx.fillStyle = face === "R" ? "#f3efe4" : "#7aa2e3";
+          ctx.font = "700 18px 'Source Serif 4', serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(face, 0, 1);
+        }
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0c1018";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const bet = stake(model.n, model.r, model.b);
+
+        ctx.fillStyle = "#f3efe4";
+        ctx.font = "600 18px 'Source Serif 4', serif";
+        ctx.textAlign = "left";
+        ctx.fillText("fortune  $" + model.displayF.toFixed(3), 28, 36);
+        ctx.fillStyle = "#6ec8b6";
+        ctx.font = "13px 'IBM Plex Mono', monospace";
+        ctx.fillText("target   $" + target().toFixed(3) + "   =  2^{2n} / C(2n,n)", 28, 58);
+
+        ctx.fillStyle = "#e07a6a";
+        ctx.fillText("red left  " + model.r, 28, 88);
+        ctx.fillStyle = "#7aa2e3";
+        ctx.fillText("black left " + model.b, 160, 88);
+        ctx.fillStyle = "#d4b15a";
+        if (bet.color) ctx.fillText("bet $" + bet.x.toFixed(3) + " on " + (bet.color === "R" ? "red" : "black"), 320, 88);
+        else ctx.fillText("sit out  (r = b)", 320, 88);
+
+        const remaining = model.deck.length - model.i;
+        for (let k = 0; k < remaining; k += 1) {
+          const x = 28 + k * 18;
+          const y = 118;
+          const flipping = k === 0 && model.flip > 0 && model.i < model.deck.length;
+          drawCard(x, y, 44, 62, flipping ? model.deck[model.i] : "?", flipping ? model.flip : 0);
+        }
+
+        const played = model.deck.slice(0, model.i);
+        played.forEach((c, k) => {
+          drawCard(28 + k * 22, 200, 36, 50, c, 1);
+        });
+
+        const left = 28;
+        const top = 280;
+        const bw = 800;
+        const bh = 120;
+        ctx.strokeStyle = "rgba(243,239,228,0.2)";
+        ctx.strokeRect(left, top, bw, bh);
+        const tgt = target();
+        const ymax = Math.max(tgt * 1.15, ...model.path, 1.2);
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = "rgba(110,200,182,0.7)";
+        ctx.beginPath();
+        const ty = top + bh - (tgt / ymax) * bh;
+        ctx.moveTo(left, ty);
+        ctx.lineTo(left + bw, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if (model.path.length > 1) {
+          ctx.beginPath();
+          model.path.forEach((f, i) => {
+            const x = left + (i / (2 * model.n)) * bw;
+            const y = top + bh - (f / ymax) * bh;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.strokeStyle = "#d4b15a";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#a8b0c0";
+        ctx.font = "12px 'IBM Plex Sans', sans-serif";
+        ctx.fillText("fortune path  ·  every shuffle ends on the mint line", left, 418);
+
+        const done = model.i >= model.deck.length;
+        stat.textContent = done
+          ? ("locked $" + model.F.toFixed(3))
+          : ((2 * model.n - model.i) + " cards left");
+      }
+
+      async function flipOne() {
+        if (model.busy || model.i >= model.deck.length) return;
+        model.busy = true;
+        const color = model.deck[model.i];
+        model.last = color;
+        model.flip = 0;
+        await tween(420, (u) => { model.flip = u; });
+        if (color === "R") model.r -= 1;
+        else model.b -= 1;
+        model.i += 1;
+        model.F = fortune(model.n, model.r, model.b);
+        model.path.push(model.F);
+        const from = model.displayF;
+        await tween(280, (u) => { model.displayF = lerp(from, model.F, easeOut(u)); });
+        model.displayF = model.F;
+        model.flip = 0;
+        model.busy = false;
+      }
+
+      async function playAll() {
+        if (model.busy) return;
+        while (model.i < model.deck.length) {
+          await flipOne();
+          await wait(90);
+        }
+      }
+
+      nInput.oninput = () => { if (!model.busy) reset(); };
+      root.querySelector("[data-act=flip]").onclick = () => { flipOne(); };
+      root.querySelector("[data-act=play]").onclick = () => { playAll(); };
+      root.querySelector("[data-act=reshuffle]").onclick = () => { if (!model.busy) reset(); };
+      reset();
+      startLoop(draw);
+      later(() => { playAll(); }, 450);
     }
   };
 })();
