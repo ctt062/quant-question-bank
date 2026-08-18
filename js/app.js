@@ -166,16 +166,26 @@
   }
 
   function typeset(el) {
-    if (!window.renderMathInElement) return;
-    window.renderMathInElement(el, {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "\\[", right: "\\]", display: true },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "$", right: "$", display: false }
-      ],
-      throwOnError: false
-    });
+    const run = () => {
+      if (!window.renderMathInElement || !el) return false;
+      window.renderMathInElement(el, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false,
+        strict: "ignore",
+        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "canvas"]
+      });
+      return true;
+    };
+    if (run()) return;
+    let tries = 0;
+    const id = setInterval(() => {
+      tries += 1;
+      if (run() || tries > 40) clearInterval(id);
+    }, 50);
   }
 
   function escapeHtml(s) {

@@ -256,7 +256,12 @@ h3 { font-size: 20px; margin: 28px 0 10px; }
   margin-bottom: 16px;
 }
 
-.statement .katex-display, .solution .katex-display { overflow-x: auto; overflow-y: hidden; }
+.statement .katex, .solution .katex { color: inherit; font-size: 1.12em; }
+.statement .katex-display, .solution .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1.1em 0;
+}
 
 textarea.notes-box {
   width: 100%;
