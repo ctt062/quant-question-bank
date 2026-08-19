@@ -58,8 +58,9 @@
 
   function setView(name) {
     document.body.dataset.view = name;
+    const nav = (location.hash || "").slice(1) === "topics" ? "topics" : name;
     document.querySelectorAll(".topnav a").forEach((a) => {
-      a.classList.toggle("active", a.dataset.nav === name);
+      a.classList.toggle("active", a.dataset.nav === nav);
     });
   }
 
@@ -441,15 +442,25 @@
     return (!h || h === "#") ? "#home" : h;
   }
 
+  function scrollToLibrary() {
+    const el = document.getElementById("topics");
+    if (!el) return;
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    el.scrollIntoView({ behavior: "auto", block: "start" });
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "auto", block: "start" });
+      html.style.scrollBehavior = prev;
+    });
+  }
+
   function route() {
     const r = parseHash();
     if (r.view === "home") {
       renderHome();
-      if (r.scroll) {
-        requestAnimationFrame(() => {
-          const el = document.getElementById(r.scroll);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+      if (r.scroll === "topics") {
+        requestAnimationFrame(() => scrollToLibrary());
       } else {
         toTop();
       }
@@ -482,12 +493,13 @@
 
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   document.addEventListener("click", (ev) => {
-    const a = ev.target.closest('a[href="#home"], a[href="#catalog"]');
+    const a = ev.target.closest('a[href="#home"], a[href="#catalog"], a[href="#topics"]');
     if (!a) return;
-    if (currentHash() === a.getAttribute("href")) {
-      ev.preventDefault();
-      toTop();
-    }
+    const href = a.getAttribute("href");
+    if (currentHash() !== href) return;
+    ev.preventDefault();
+    if (href === "#topics") scrollToLibrary();
+    else toTop();
   });
   window.addEventListener("hashchange", route);
   window.addEventListener("keydown", (ev) => {

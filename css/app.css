@@ -199,6 +199,9 @@ a:hover { text-decoration: underline; }
 .section {
   padding: 28px 0 8px;
 }
+#topics {
+  scroll-margin-top: calc(var(--bar) + 12px);
+}
 .section-title {
   margin: 0 0 8px;
   font-size: 28px;
