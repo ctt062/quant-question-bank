@@ -141,11 +141,18 @@ a:hover { text-decoration: underline; }
   background: var(--ink);
 }
 .gh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: 2px;
+  border-radius: 10px;
   color: var(--paper);
-  font-size: 14px;
   text-decoration: none;
 }
-.gh:hover { color: var(--gold); }
+.gh svg { display: block; }
+.gh:hover { color: var(--gold); text-decoration: none; }
 
 .stage {
   position: relative;
