@@ -512,15 +512,16 @@ body[data-view="problem"] .site-foot { display: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   width: fit-content;
-  min-width: 44px;
   min-height: 44px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 12px;
   border: 1px solid var(--line-strong);
   background: var(--panel);
   color: var(--gold);
-  font-size: 22px;
+  font-family: var(--mono);
+  font-size: 13px;
   line-height: 1;
   text-decoration: none;
 }
