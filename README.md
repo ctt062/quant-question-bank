@@ -6,6 +6,8 @@ Problems are grouped by topic (probability, geometric probability, combinatorics
 
 Live site: [https://quant-question-bank.vercel.app](https://quant-question-bank.vercel.app)
 
+Source: [https://github.com/ctt062/quant-question-bank](https://github.com/ctt062/quant-question-bank)
+
 ## Run locally
 
 ```bash
