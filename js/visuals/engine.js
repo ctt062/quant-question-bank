@@ -170,15 +170,15 @@
   };
 
   window.Visuals = {
-    mount(name, el) {
+    mount(name, el, problem) {
       clearAnim();
-      const fn = this[name];
+      const fn = this[name] || (problem && problem.sim ? this.sim : null);
       if (!fn) {
         el.innerHTML = "<p class=\"viz-caption\">No figure for this problem yet.</p>";
         return;
       }
       el.innerHTML = "";
-      fn.call(this, el);
+      fn.call(this, el, problem);
     }
   };
 })();

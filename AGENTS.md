@@ -28,14 +28,14 @@ Existing hard-set answers must not change:
 
 ## Schema
 
-Each record in `js/problems.js` / `js/problems-more.js` needs:
+Each record in `js/problems.js`, `js/problems-more.js`, or `js/problems-fill-*.js` needs:
 
 - `id` - stable hash fragment
 - `topic` - one of `probability`, `geometric`, `combinatorics`, `games`, `statistics`, `strategy`
 - `difficulty` - `easy` | `medium` | `hard`
 - `time`, `title`, `blurb`
 - `statement` and `solution` as `String.raw` HTML
-- `visual` - key registered on `window.Visuals`
+- `visual` - key registered on `window.Visuals` (`sim` plus a `sim: { title, theory, caption, trial }` object is the shared Monte Carlo figure)
 
 Topics live in `window.TOPICS`. Do not invent a seventh topic without updating the landing page copy.
 

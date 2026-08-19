@@ -24,16 +24,16 @@ No build step. The site is HTML, CSS, and JavaScript.
 
 ## Catalog
 
-Twenty problems. Easy / medium / hard inside each topic.
+Ninety problems. Five easy, five medium, and five hard in each of the six topics.
 
 | Topic | Easy | Medium | Hard |
 | --- | --- | --- | --- |
-| Probability | Waiting for the first six | Coupon collector | HTH vs HHH |
-| Geometric probability | Two points in the same half | Buffon's needle | Broken stick; covering the circle |
-| Combinatorics | Expected fixed points | Expected cycle count | Longest cycle past n/2 |
-| Games and betting | Monty Hall | Penney's game | Red-black even-money betting |
-| Statistics | Rare disease and a good test | Standard error of the mean | Multiple testing; uniform order stats |
-| Strategy | Three prisoners | Three hats | 100 prisoners |
+| Probability | First six; first head; dice sum 7 | Coupon collector; birthday; waiting for HH vs HT | HTH vs HHH; Bertrand's boxes; secretary |
+| Geometric probability | Same half; below the diagonal; Buffon warm-up | Buffon's needle; spacings; random radius | Broken stick; covering the circle; Bertrand chord |
+| Combinatorics | Fixed points; handshakes; 2^n subsets | Cycle count; inversions; Catalan parentheses | Longest cycle; airplane seating; Cayley trees |
+| Games and betting | Monty Hall; matching pennies; first to heads | Penney's game; nontransitive dice; Kelly | Red-black; beauty contest; bold play |
+| Statistics | Medical test; Bernoulli variance; Type I error | SE of the mean; Simpson; regression to the mean | Multiple testing; German tank; optional stopping |
+| Strategy | Three prisoners; cut and choose; one-shot PD | Three hats; Vickrey; three pirates | 100 prisoners; hat parity; blue eyes |
 
 Work each problem before opening the solution. A common first-pass for HTH is \(E[T]=8\); the linear system gives \(10\). A common first-pass for HTH beating HHH is \(2/3\); the race probability is \(3/5\).
 

@@ -103,7 +103,7 @@
         <section class="hero-home">
           <p class="kicker">Quant question bank</p>
           <h1>Later-round problems, with the mechanism in view.</h1>
-          <p class="lede">Twenty interview questions across probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
+          <p class="lede">${PROBLEMS.length} interview questions across probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#catalog">Browse the catalog</a>
             <button class="search-hero" type="button" data-open-search>
@@ -137,15 +137,6 @@
                   <p class="diff-line">${items.length} problems · Easy ${counts[0]} · Medium ${counts[1]} · Hard ${counts[2]}</p>
                 </a>`;
             }).join("")}
-          </div>
-        </section>
-        <section class="section">
-          <p class="section-kicker">Method</p>
-          <h2 class="section-title">How to use the bank</h2>
-          <div class="steps">
-            <div class="step"><div class="n">01</div><h3>Pick a band</h3><p>Start Easy in a topic, then Medium, then the later-round Hard set.</p></div>
-            <div class="step"><div class="n">02</div><h3>Work first</h3><p>Start the timer. Sketch states and the sample space before you touch the solution.</p></div>
-            <div class="step"><div class="n">03</div><h3>Play the figure</h3><p>Every problem has an animation. The picture is part of the argument, not decoration.</p></div>
           </div>
         </section>
         <section class="section">
@@ -292,7 +283,7 @@
     `;
     typeset(stage);
     const viz = stage.querySelector("[data-viz]");
-    if (window.Visuals) window.Visuals.mount(p.visual, viz);
+    if (window.Visuals) window.Visuals.mount(p.visual, viz, p);
 
     const notes = stage.querySelector("[data-notes]");
     notes.addEventListener("input", () => {
