@@ -35,7 +35,7 @@ Each record in `js/problems.js`, `js/problems-more.js`, or `js/problems-fill-*.j
 - `difficulty` - `easy` | `medium` | `hard`
 - `time`, `title`, `blurb`
 - `statement` and `solution` as `String.raw` HTML
-- `visual` - key registered on `window.Visuals` (`sim` plus a `sim: { title, theory, caption, trial }` object is the shared Monte Carlo figure)
+- `visual` - key registered on `window.Visuals`. Prefer `figure: { kind, title, caption, ... }` with `visual: "explain"` for a picture of the argument. Custom playable figures stay on named keys. `sim` plus `sim: { title, theory, caption, trial }` remains the shared running-mean figure when a Monte Carlo overlay is the right picture.
 
 Topics live in `window.TOPICS`. Do not invent a seventh topic without updating the landing page copy.
 
@@ -45,9 +45,9 @@ Problem HTML is inserted with `innerHTML`. Never put a raw `<` or `>` inside mat
 
 ## Figures
 
-Shared animation helpers are `js/visuals/engine.js` (`window.Viz`). Existing hard-set figures stay in `js/visuals.js`. New figures go in `js/visuals/<topic>.js` and attach with `Object.assign(window.Visuals, { ... })`.
+Shared animation helpers are `js/visuals/engine.js` (`window.Viz`). Existing hard-set figures stay in `js/visuals.js` and `js/visuals/<topic>.js`. Diagram kinds for the 70 later problems live in `js/visuals/explain.js` (`Visuals.explain`).
 
-Every figure needs Play (or equivalent), Reset, and a short caption. Prefer an autoplay once on mount. Monte Carlo overlays are welcome when the answer is a probability or an expectation.
+A figure should make the argument visible: a sample space, a payoff matrix, a graph, a stick, a permutation. Do not attach a running-mean Monte Carlo that only restates the number. Use `New sample` when a fresh draw helps; omit it on static diagrams.
 
 Register new scripts in `index.html` after `engine.js` and before `app.js`.
 
