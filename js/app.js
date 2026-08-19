@@ -3,8 +3,17 @@
   const TOPICS = window.TOPICS;
   const DIFFICULTIES = window.DIFFICULTIES;
   const stage = document.getElementById("stage");
-  const toc = document.getElementById("toc");
+  const cmdk = document.getElementById("cmdk");
+  const cmdkInput = document.getElementById("cmdk-input");
+  const cmdkResults = document.getElementById("cmdk-results");
   const storeKey = "qip-desk-v2";
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform) || navigator.userAgent.includes("Mac");
+  const kbdChord = isMac ? "⌘K" : "Ctrl+K";
+
+  document.querySelectorAll("[data-kbd]").forEach((el) => {
+    if (el.tagName === "KBD" || el.hasAttribute("data-kbd")) el.textContent = el.textContent.includes("esc") ? "esc" : kbdChord;
+  });
+  document.querySelectorAll(".search-launch kbd, .search-hero kbd").forEach((el) => { el.textContent = kbdChord; });
 
   const state = load() || {
     notes: {},
@@ -15,7 +24,8 @@
   state.timer.id = null;
   if (typeof state.timer.remain !== "number") state.timer.remain = 12 * 60;
 
-  const filters = { topic: null, difficulty: null };
+  const catalog = { q: "", topic: null, difficulty: null };
+  const pal = { q: "", active: 0, items: [] };
 
   function load() {
     try { return JSON.parse(localStorage.getItem(storeKey) || localStorage.getItem("qip-desk-v1") || "null"); }
@@ -32,33 +42,39 @@
   function topicOf(id) { return TOPICS.find((t) => t.id === id); }
   function topicLabel(id) { return (topicOf(id) || {}).label || id; }
   function diffLabel(id) { return (DIFFICULTIES.find((d) => d.id === id) || {}).label || id; }
+  function seenCount() { return PROBLEMS.filter((p) => state.seen[p.id]).length; }
 
   function parseHash() {
     const raw = (location.hash || "#home").slice(1);
-    if (!raw || raw === "home") return { view: "home" };
+    if (!raw || raw === "home" || raw === "topics") return { view: "home", scroll: raw === "topics" ? "topics" : null };
+    if (raw === "catalog") return { view: "catalog" };
     if (raw.startsWith("cat/")) {
       const parts = raw.split("/");
-      return { view: "cat", topic: parts[1], difficulty: parts[2] || null };
+      return { view: "catalog", topic: parts[1], difficulty: parts[2] || null };
     }
-    if (raw.startsWith("diff/")) return { view: "diff", difficulty: raw.split("/")[1] };
+    if (raw.startsWith("diff/")) return { view: "catalog", difficulty: raw.split("/")[1] };
     const p = PROBLEMS.find((x) => x.id === raw);
     if (p) return { view: "problem", id: p.id };
     return { view: "home" };
   }
 
-  function filtered(topic, difficulty) {
-    return PROBLEMS.filter((p) => {
-      if (topic && p.topic !== topic) return false;
-      if (difficulty && p.difficulty !== difficulty) return false;
-      return true;
+  function setView(name) {
+    document.body.dataset.view = name;
+    document.querySelectorAll(".topnav a").forEach((a) => {
+      a.classList.toggle("active", a.dataset.nav === name);
     });
   }
 
-  function grouped(list) {
-    return TOPICS.map((t) => ({
-      topic: t,
-      items: list.filter((p) => p.topic === t.id)
-    })).filter((g) => g.items.length);
+  function filtered(topic, difficulty, q) {
+    const query = (q || "").trim().toLowerCase();
+    const terms = query.split(/\s+/).filter(Boolean);
+    return PROBLEMS.filter((p) => {
+      if (topic && p.topic !== topic) return false;
+      if (difficulty && p.difficulty !== difficulty) return false;
+      if (!terms.length) return true;
+      const hay = [p.title, p.blurb, topicLabel(p.topic), p.difficulty, p.id].join(" ").toLowerCase();
+      return terms.every((t) => hay.includes(t));
+    });
   }
 
   function byDifficulty(list) {
@@ -66,53 +82,6 @@
       diff: d,
       items: list.filter((p) => p.difficulty === d.id)
     })).filter((g) => g.items.length);
-  }
-
-  function seenCount() {
-    return PROBLEMS.filter((p) => state.seen[p.id]).length;
-  }
-
-  function renderToc(activeId) {
-    const route = parseHash();
-    const topic = route.topic || null;
-    const difficulty = route.difficulty || filters.difficulty;
-    const list = filtered(topic, route.view === "diff" ? route.difficulty : difficulty);
-    const groups = grouped(route.view === "diff" ? filtered(null, route.difficulty) : (topic ? filtered(topic, null) : PROBLEMS));
-    toc.innerHTML = `
-      <a class="toc-item ${route.view === "home" ? "active" : ""}" href="#home">
-        <span class="toc-num">⌂</span>
-        <span>Landing<small>${seenCount()} / ${PROBLEMS.length} revealed</small></span>
-      </a>
-      ${TOPICS.map((t) => {
-        const n = PROBLEMS.filter((p) => p.topic === t.id).length;
-        return `
-          <a class="toc-item ${topic === t.id && route.view === "cat" ? "active" : ""}" href="#cat/${t.id}">
-            <span class="toc-num">${String(n).padStart(2, "0")}</span>
-            <span>${t.label}<small>${t.blurb}</small></span>
-          </a>`;
-      }).join("")}
-      <div class="toc-split">Problems</div>
-      ${groups.map((g) => `
-        <div class="toc-group">
-          <a class="toc-group-title" href="#cat/${g.topic.id}">${g.topic.label}</a>
-          ${g.items.map((p) => `
-            <a class="toc-item toc-problem ${p.id === activeId ? "active" : ""}" href="#${p.id}">
-              <span class="toc-num diff-${p.difficulty}">${p.difficulty[0].toUpperCase()}</span>
-              <span>${p.title}<small>${diffLabel(p.difficulty)}</small></span>
-            </a>
-          `).join("")}
-        </div>
-      `).join("")}
-    `;
-  }
-
-  function chipRow(extra) {
-    return `
-      <div class="meta-row">
-        ${TOPICS.map((t) => `<a class="chip" href="#cat/${t.id}">${t.label}</a>`).join("")}
-        ${DIFFICULTIES.map((d) => `<a class="chip diff-${d.id}" href="#diff/${d.id}">${d.label}</a>`).join("")}
-        ${extra || ""}
-      </div>`;
   }
 
   function problemCard(p) {
@@ -125,86 +94,132 @@
   }
 
   function renderHome() {
-    filters.topic = null;
-    filters.difficulty = null;
-    renderToc(null);
+    setView("home");
     stopTimer(false);
-    const featured = PROBLEMS.filter((p) => p.difficulty === "hard").slice(0, 6);
+    const featured = PROBLEMS.filter((p) => p.difficulty === "hard").slice(0, 4);
+    const seen = seenCount();
     stage.innerHTML = `
-      <section class="hero landing">
-        <p class="kicker">Quant interview desk</p>
-        <h1>Work the mechanism, then open the door.</h1>
-        <p class="lede">A study desk for later-round quant interviews: probability, geometry, combinatorics, games, statistics, and strategy. Time yourself. Write a setup. Reveal the solution only after you have one.</p>
-        ${chipRow(`<span class="chip">${seenCount()} / ${PROBLEMS.length} solutions revealed</span>`)}
-        <div class="how">
-          <div>
-            <h3>How to use the desk</h3>
-            <ol class="clean">
-              <li>Pick a topic, then an Easy before a Hard.</li>
-              <li>Start the timer. Sketch states, not the answer.</li>
-              <li>Play the figure. The animation is part of the argument.</li>
-              <li>Reveal only when you would say it out loud.</li>
-            </ol>
+      <div class="wrap">
+        <section class="hero-home">
+          <p class="kicker">Quant question bank</p>
+          <h1>Later-round problems, with the mechanism in view.</h1>
+          <p class="lede">Twenty interview questions across probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#catalog">Browse the catalog</a>
+            <button class="search-hero" type="button" data-open-search>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Search problems
+              <kbd>${kbdChord}</kbd>
+            </button>
           </div>
-          <div class="progress-panel">
-            <h3>Local progress</h3>
-            <p>Notes and reveals stay in this browser. Nothing is uploaded.</p>
-            <div class="progress-bar"><span style="width:${(100 * seenCount() / PROBLEMS.length).toFixed(1)}%"></span></div>
-            <p class="footer-note">${seenCount()} of ${PROBLEMS.length} solutions opened on this machine.</p>
+        </section>
+        <div class="stats">
+          <div class="stat-card"><b>${PROBLEMS.length}</b><span>problems</span></div>
+          <div class="stat-card"><b>${TOPICS.length}</b><span>topics</span></div>
+          <div class="stat-card"><b>3</b><span>difficulty bands</span></div>
+          <div class="stat-card"><b>${seen}/${PROBLEMS.length}</b><span>revealed on this device</span></div>
+        </div>
+        <section class="section" id="topics">
+          <p class="section-kicker">Library</p>
+          <h2 class="section-title">Six topics, easy to hard</h2>
+          <div class="bento">
+            ${TOPICS.map((t) => {
+              const items = PROBLEMS.filter((p) => p.topic === t.id);
+              const counts = DIFFICULTIES.map((d) => items.filter((p) => p.difficulty === d.id).length);
+              return `
+                <a class="topic-card" href="#cat/${t.id}">
+                  <span class="mark">${t.label.slice(0, 1)}</span>
+                  <h3>${t.label}</h3>
+                  <p>${t.blurb}</p>
+                  <p class="diff-line">${items.length} problems · Easy ${counts[0]} · Medium ${counts[1]} · Hard ${counts[2]}</p>
+                </a>`;
+            }).join("")}
           </div>
-        </div>
-        <h2 class="section-title">Topics</h2>
-        <div class="grid-cards topic-grid">
-          ${TOPICS.map((t) => {
-            const items = PROBLEMS.filter((p) => p.topic === t.id);
-            const counts = DIFFICULTIES.map((d) => items.filter((p) => p.difficulty === d.id).length);
-            return `
-              <a class="card topic-card" href="#cat/${t.id}">
-                <div class="num">${items.length} problems</div>
-                <h3>${t.label}</h3>
-                <p>${t.blurb}</p>
-                <p class="diff-line">Easy ${counts[0]} · Medium ${counts[1]} · Hard ${counts[2]}</p>
-              </a>`;
-          }).join("")}
-        </div>
-        <h2 class="section-title">Browse by difficulty</h2>
-        <div class="grid-cards three">
-          ${DIFFICULTIES.map((d) => {
-            const items = PROBLEMS.filter((p) => p.difficulty === d.id);
-            return `
-              <a class="card" href="#diff/${d.id}">
-                <div class="num diff-label diff-${d.id}">${d.label} · ${items.length}</div>
-                <h3>${d.label} set</h3>
-                <p>${d.hint}</p>
-              </a>`;
-          }).join("")}
-        </div>
-        <h2 class="section-title">Featured hard problems</h2>
-        <div class="grid-cards">${featured.map(problemCard).join("")}</div>
-        <p class="footer-note">HTH vs HHH is derived in full on its page. The waiting time for HTH is 10, not the common first-pass 8.</p>
-        <p class="footer-note">Source on <a href="https://github.com/ctt062/quant-interview-prep">GitHub</a> · MIT license · static hosting on Vercel</p>
-      </section>
+        </section>
+        <section class="section">
+          <p class="section-kicker">Method</p>
+          <h2 class="section-title">How to use the bank</h2>
+          <div class="steps">
+            <div class="step"><div class="n">01</div><h3>Pick a band</h3><p>Start Easy in a topic, then Medium, then the later-round Hard set.</p></div>
+            <div class="step"><div class="n">02</div><h3>Work first</h3><p>Start the timer. Sketch states and the sample space before you touch the solution.</p></div>
+            <div class="step"><div class="n">03</div><h3>Play the figure</h3><p>Every problem has an animation. The picture is part of the argument, not decoration.</p></div>
+          </div>
+        </section>
+        <section class="section">
+          <p class="section-kicker">Hard set</p>
+          <h2 class="section-title">Featured later-round questions</h2>
+          <div class="grid-cards">${featured.map(problemCard).join("")}</div>
+        </section>
+      </div>
     `;
+    bindSearchButtons(stage);
   }
 
-  function renderBrowse(topic, difficulty, heading) {
-    renderToc(null);
+  function renderCatalog(topic, difficulty) {
+    setView("catalog");
     stopTimer(false);
-    const list = filtered(topic, difficulty);
-    const groups = difficulty ? [{ diff: { id: difficulty, label: diffLabel(difficulty) }, items: list }] : byDifficulty(list);
-    const t = topicOf(topic);
+    if (topic !== undefined) catalog.topic = topic || null;
+    if (difficulty !== undefined) catalog.difficulty = difficulty || null;
+    const list = filtered(catalog.topic, catalog.difficulty, catalog.q);
+    const groups = byDifficulty(list);
+    const t = topicOf(catalog.topic);
+    const heading = t ? t.label : (catalog.difficulty ? diffLabel(catalog.difficulty) + " problems" : "Catalog");
     stage.innerHTML = `
-      <section class="hero">
-        <p class="kicker">${heading || (t ? t.label : "Catalog")}</p>
-        <h1>${t ? t.label : (difficulty ? diffLabel(difficulty) + " problems" : "Catalog")}</h1>
-        <p class="lede">${t ? t.blurb : "Filter the desk without mixing difficulties. Easy first, then the later-round set."}</p>
-        ${chipRow()}
-        ${groups.map((g) => `
+      <div class="wrap">
+        <section class="catalog-head">
+          <p class="kicker">Question bank</p>
+          <h1>${heading}</h1>
+          <p class="lede">${t ? t.blurb : "Filter by topic and difficulty. Search matches titles, blurbs, and tags."}</p>
+          <div class="filters">
+            <label class="catalog-search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <input type="search" placeholder="Filter this list…" value="${escapeHtml(catalog.q)}" data-catalog-q />
+            </label>
+            <button class="filter-chip ${!catalog.topic ? "on" : ""}" data-topic="">All topics</button>
+            ${TOPICS.map((x) => `<button class="filter-chip ${catalog.topic === x.id ? "on" : ""}" data-topic="${x.id}">${x.label}</button>`).join("")}
+          </div>
+          <div class="filters">
+            <button class="filter-chip ${!catalog.difficulty ? "on" : ""}" data-diff="">All levels</button>
+            ${DIFFICULTIES.map((d) => `<button class="filter-chip ${catalog.difficulty === d.id ? "on" : ""} diff-${d.id}" data-diff="${d.id}">${d.label}</button>`).join("")}
+            <span class="chip">${list.length} shown</span>
+          </div>
+        </section>
+        ${groups.length ? groups.map((g) => `
           <h2 class="section-title"><span class="diff-label diff-${g.diff.id}">${g.diff.label}</span></h2>
           <div class="grid-cards">${g.items.map(problemCard).join("")}</div>
-        `).join("")}
-      </section>
+        `).join("") : `<p class="lede">No problems match that filter.</p>`}
+      </div>
     `;
+    const qInput = stage.querySelector("[data-catalog-q]");
+    qInput.addEventListener("input", () => {
+      catalog.q = qInput.value;
+      renderCatalog();
+      const again = document.querySelector("[data-catalog-q]");
+      if (again) {
+        again.focus();
+        const n = again.value.length;
+        again.setSelectionRange(n, n);
+      }
+    });
+    stage.querySelectorAll("[data-topic]").forEach((btn) => {
+      btn.onclick = () => {
+        catalog.topic = btn.dataset.topic || null;
+        location.hash = catalog.topic ? ("cat/" + catalog.topic) : "catalog";
+        renderCatalog(catalog.topic, catalog.difficulty);
+      };
+    });
+    stage.querySelectorAll("[data-diff]").forEach((btn) => {
+      btn.onclick = () => {
+        catalog.difficulty = btn.dataset.diff || null;
+        renderCatalog(catalog.topic, catalog.difficulty);
+      };
+    });
   }
 
   function fmt(sec) {
@@ -225,8 +240,7 @@
   }
 
   function renderProblem(p) {
-    filters.topic = p.topic;
-    renderToc(p.id);
+    setView("problem");
     stopTimer(true);
     const note = state.notes[p.id] || "";
     const list = filtered(p.topic, null);
@@ -235,7 +249,15 @@
     const next = list[idx + 1];
     stage.innerHTML = `
       <article class="problem">
-        <p class="kicker"><a href="#cat/${p.topic}">${topicLabel(p.topic)}</a> · <span class="diff-label diff-${p.difficulty}">${diffLabel(p.difficulty)}</span></p>
+        <nav class="crumbs">
+          <a href="#home">Home</a>
+          <span>/</span>
+          <a href="#catalog">Catalog</a>
+          <span>/</span>
+          <a href="#cat/${p.topic}">${topicLabel(p.topic)}</a>
+          <span>/</span>
+          <span class="diff-label diff-${p.difficulty}">${diffLabel(p.difficulty)}</span>
+        </nav>
         <h1>${p.title}</h1>
         <div class="meta-row">
           <span class="chip">${p.time}</span>
@@ -285,7 +307,6 @@
       state.seen[p.id] = true;
       save();
       typeset(sol);
-      renderToc(p.id);
     };
     stage.querySelector("[data-act=hide]").onclick = () => sol.classList.remove("open");
     stage.querySelector("[data-act=timer]").onclick = (ev) => {
@@ -342,25 +363,137 @@
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, (c) => ({
+    return String(s).replace(/[&<>"']/g, (c) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     }[c]));
   }
 
+  function searchItems(q) {
+    const list = filtered(null, null, q);
+    if (!q.trim()) return PROBLEMS.slice();
+    const ql = q.toLowerCase();
+    return list.slice().sort((a, b) => {
+      const at = a.title.toLowerCase().startsWith(ql) ? 1 : 0;
+      const bt = b.title.toLowerCase().startsWith(ql) ? 1 : 0;
+      return bt - at;
+    });
+  }
+
+  function renderPalette() {
+    pal.items = searchItems(pal.q);
+    if (pal.active >= pal.items.length) pal.active = Math.max(0, pal.items.length - 1);
+    if (!pal.items.length) {
+      cmdkResults.innerHTML = `<div class="cmdk-empty">No problems match "${escapeHtml(pal.q)}".</div>`;
+      return;
+    }
+    const groups = groupedKeepOrder(pal.items);
+    cmdkResults.innerHTML = groups.map((g) => `
+      <div class="cmdk-group">${g.topic.label}</div>
+      ${g.items.map((p) => {
+        const i = pal.items.indexOf(p);
+        return `
+          <button class="cmdk-item ${i === pal.active ? "active" : ""}" type="button" data-i="${i}">
+            <span>${p.title}<small>${diffLabel(p.difficulty)} · ${p.blurb}</small></span>
+            <span class="diff-label diff-${p.difficulty}">${p.difficulty}</span>
+          </button>`;
+      }).join("")}
+    `).join("");
+    cmdkResults.querySelectorAll(".cmdk-item").forEach((btn) => {
+      btn.onmouseenter = () => { pal.active = Number(btn.dataset.i); paintActive(); };
+      btn.onclick = () => goItem(Number(btn.dataset.i));
+    });
+    const active = cmdkResults.querySelector(".cmdk-item.active");
+    if (active) active.scrollIntoView({ block: "nearest" });
+  }
+
+  function groupedKeepOrder(list) {
+    return TOPICS.map((t) => ({
+      topic: t,
+      items: list.filter((p) => p.topic === t.id)
+    })).filter((g) => g.items.length);
+  }
+
+  function paintActive() {
+    cmdkResults.querySelectorAll(".cmdk-item").forEach((el) => {
+      el.classList.toggle("active", Number(el.dataset.i) === pal.active);
+    });
+    const active = cmdkResults.querySelector(".cmdk-item.active");
+    if (active) active.scrollIntoView({ block: "nearest" });
+  }
+
+  function goItem(i) {
+    const p = pal.items[i];
+    if (!p) return;
+    closeSearch();
+    location.hash = p.id;
+  }
+
+  function openSearch(seed) {
+    pal.q = seed || "";
+    pal.active = 0;
+    cmdk.hidden = false;
+    cmdkInput.value = pal.q;
+    renderPalette();
+    requestAnimationFrame(() => cmdkInput.focus());
+  }
+
+  function closeSearch() {
+    cmdk.hidden = true;
+  }
+
+  function bindSearchButtons(root) {
+    (root || document).querySelectorAll("[data-open-search]").forEach((el) => {
+      el.onclick = () => openSearch();
+    });
+  }
+
   function route() {
     const r = parseHash();
-    if (r.view === "home") return renderHome();
-    if (r.view === "cat") return renderBrowse(r.topic, r.difficulty, topicLabel(r.topic));
-    if (r.view === "diff") return renderBrowse(null, r.difficulty, diffLabel(r.difficulty));
+    if (r.view === "home") {
+      renderHome();
+      if (r.scroll) {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(r.scroll);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      return;
+    }
+    if (r.view === "catalog") {
+      catalog.topic = r.topic || null;
+      if (r.difficulty) catalog.difficulty = r.difficulty;
+      return renderCatalog(catalog.topic, catalog.difficulty);
+    }
     const p = PROBLEMS.find((x) => x.id === r.id);
     if (!p) return renderHome();
     renderProblem(p);
   }
 
+  cmdkInput.addEventListener("input", () => {
+    pal.q = cmdkInput.value;
+    pal.active = 0;
+    renderPalette();
+  });
+  cmdk.querySelector("[data-close-search]").addEventListener("click", closeSearch);
+  bindSearchButtons(document);
+
   window.addEventListener("hashchange", route);
   window.addEventListener("keydown", (ev) => {
+    const metaK = (ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === "k";
+    if (metaK) {
+      ev.preventDefault();
+      if (cmdk.hidden) openSearch();
+      else closeSearch();
+      return;
+    }
+    if (!cmdk.hidden) {
+      if (ev.key === "Escape") { ev.preventDefault(); closeSearch(); }
+      if (ev.key === "ArrowDown") { ev.preventDefault(); pal.active = Math.min(pal.items.length - 1, pal.active + 1); paintActive(); }
+      if (ev.key === "ArrowUp") { ev.preventDefault(); pal.active = Math.max(0, pal.active - 1); paintActive(); }
+      if (ev.key === "Enter") { ev.preventDefault(); goItem(pal.active); }
+      return;
+    }
     if (["INPUT", "TEXTAREA"].includes(ev.target.tagName)) return;
-    if (ev.key === "h" || ev.key === "H") location.hash = "home";
     if (ev.key === "s" || ev.key === "S") {
       const sol = document.querySelector("[data-solution]");
       if (sol) sol.classList.toggle("open");

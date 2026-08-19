@@ -7,7 +7,8 @@ Read this file before changing the catalog, figures, or public copy. For a new p
 ## Product
 
 - One-page static site. No bundler, no backend, no environment variables.
-- Hash routes: `#home`, `#cat/<topic>`, `#diff/<easy|medium|hard>`, `#<problem-id>`.
+- Hash routes: `#home`, `#catalog`, `#cat/<topic>`, `#diff/<easy|medium|hard>`, `#<problem-id>`.
+- Global search opens with Command+K (Ctrl+K on Windows/Linux).
 - Solutions stay hidden until the reader reveals them.
 - Every problem has a derived solution and a playable figure.
 

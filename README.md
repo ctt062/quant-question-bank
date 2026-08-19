@@ -1,10 +1,10 @@
-# Quant Interview Desk
+# Quant Question Bank
 
-A static study desk for later-round quant interview problems.
+A static site for later-round quant interview problems.
 
-Problems are grouped by topic (probability, geometric probability, combinatorics, games and betting, statistics, strategy) and by difficulty (easy, medium, hard). Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
+Problems are grouped by topic (probability, geometric probability, combinatorics, games and betting, statistics, strategy) and by difficulty (easy, medium, hard). Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra. Search from the header or with Command+K (Ctrl+K on Windows/Linux).
 
-Live site: [https://quant-interview-prep-neon.vercel.app](https://quant-interview-prep-neon.vercel.app)
+Live site: [https://quant-question-bank.vercel.app](https://quant-question-bank.vercel.app)
 
 ## Run locally
 
