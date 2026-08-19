@@ -8,8 +8,6 @@ Each problem hides the solution until you reveal it, includes a timer, and has a
 
 Use it at [https://quant-question-bank.vercel.app](https://quant-question-bank.vercel.app). Search from the header or with Command+K (Ctrl+K on Windows/Linux).
 
-Work a problem before opening the solution. A common first-pass for HTH is \(E[T]=8\); the linear system gives \(10\). A common first-pass for HTH beating HHH is \(2/3\); the race probability is \(3/5\).
-
 ## Contribute
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before you change the catalog or the public copy.
