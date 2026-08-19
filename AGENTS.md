@@ -55,6 +55,20 @@ Register new scripts in `index.html` after `engine.js` and before `app.js`.
 
 Keep `README.md` accurate: what the desk is, the live URL, how to add a problem, license. Do not vendor secrets.
 
+## Git
+
+Do not commit to `main`. Do not push to `main`.
+
+Land every later change through a pull request:
+
+1. Create a branch named for the change.
+2. Commit on that branch only.
+3. Push the branch.
+4. Open a pull request into `main`.
+5. Do not merge the pull request unless the owner explicitly asks to merge it.
+
+Never force-push `main`. Never skip the pull request to ship work.
+
 ## Style
 
 - One sentence per line in markdown.
