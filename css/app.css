@@ -196,26 +196,6 @@ a:hover { text-decoration: underline; }
 .search-hero:hover { border-color: var(--gold); }
 .search-hero kbd { margin-left: auto; }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 36px 0 8px;
-}
-.stat-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 18px 18px 16px;
-}
-.stat-card b {
-  display: block;
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 600;
-}
-.stat-card span { color: var(--fog); font-size: 13px; }
-
 .section {
   padding: 28px 0 8px;
 }
@@ -626,7 +606,7 @@ body[data-view="problem"] .site-foot { display: none; }
   .search-launch { min-width: 0; }
   .search-launch span { display: none; }
   .stage { padding: 0 16px 64px; }
-  .stats, .bento, .steps, .grid-cards { grid-template-columns: 1fr; }
+  .bento, .steps, .grid-cards { grid-template-columns: 1fr; }
   .hero-home { padding-top: 40px; }
   h1, .hero-home h1 { font-size: 36px; }
 }

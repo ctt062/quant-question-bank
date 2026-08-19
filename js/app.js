@@ -42,8 +42,6 @@
   function topicOf(id) { return TOPICS.find((t) => t.id === id); }
   function topicLabel(id) { return (topicOf(id) || {}).label || id; }
   function diffLabel(id) { return (DIFFICULTIES.find((d) => d.id === id) || {}).label || id; }
-  function seenCount() { return PROBLEMS.filter((p) => state.seen[p.id]).length; }
-
   function parseHash() {
     const raw = (location.hash || "#home").slice(1);
     if (!raw || raw === "home" || raw === "topics") return { view: "home", scroll: raw === "topics" ? "topics" : null };
@@ -97,13 +95,12 @@
     setView("home");
     stopTimer(false);
     const featured = PROBLEMS.filter((p) => p.difficulty === "hard").slice(0, 4);
-    const seen = seenCount();
     stage.innerHTML = `
       <div class="wrap">
         <section class="hero-home">
           <p class="kicker">Quant question bank</p>
           <h1>Later-round problems, with the mechanism in view.</h1>
-          <p class="lede">${PROBLEMS.length} interview questions across probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
+          <p class="lede">Probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#catalog">Browse the catalog</a>
             <button class="search-hero" type="button" data-open-search>
@@ -116,27 +113,17 @@
             </button>
           </div>
         </section>
-        <div class="stats">
-          <div class="stat-card"><b>${PROBLEMS.length}</b><span>problems</span></div>
-          <div class="stat-card"><b>${TOPICS.length}</b><span>topics</span></div>
-          <div class="stat-card"><b>3</b><span>difficulty bands</span></div>
-          <div class="stat-card"><b>${seen}/${PROBLEMS.length}</b><span>revealed on this device</span></div>
-        </div>
         <section class="section" id="topics">
           <p class="section-kicker">Library</p>
-          <h2 class="section-title">Six topics, easy to hard</h2>
+          <h2 class="section-title">Browse by topic</h2>
           <div class="bento">
-            ${TOPICS.map((t) => {
-              const items = PROBLEMS.filter((p) => p.topic === t.id);
-              const counts = DIFFICULTIES.map((d) => items.filter((p) => p.difficulty === d.id).length);
-              return `
+            ${TOPICS.map((t) => `
                 <a class="topic-card" href="#cat/${t.id}">
                   <span class="mark">${t.label.slice(0, 1)}</span>
                   <h3>${t.label}</h3>
                   <p>${t.blurb}</p>
-                  <p class="diff-line">${items.length} problems · Easy ${counts[0]} · Medium ${counts[1]} · Hard ${counts[2]}</p>
-                </a>`;
-            }).join("")}
+                  <p class="diff-line">Easy · Medium · Hard</p>
+                </a>`).join("")}
           </div>
         </section>
         <section class="section">
