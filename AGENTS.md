@@ -53,7 +53,7 @@ Register new scripts in `index.html` after `engine.js` and before `app.js`.
 
 ## Public-facing files
 
-Keep `README.md` accurate: what the desk is, how to run it, how to add a problem, license. Do not claim a live URL you have not deployed. Do not vendor secrets. This repo may stay private until the owner publishes it.
+Keep `README.md` accurate: what the desk is, the live URL, how to add a problem, license. Do not vendor secrets.
 
 ## Style
 
