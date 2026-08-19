@@ -14,6 +14,8 @@ Work a problem before opening the solution. A common first-pass for HTH is \(E[T
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before you change the catalog or the public copy.
 
+Work on a branch, then open a pull request into `main`. Do not commit or push to `main`.
+
 ### Add a problem
 
 Follow [skills/add-problem/SKILL.md](skills/add-problem/SKILL.md).
