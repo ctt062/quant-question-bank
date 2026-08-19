@@ -172,7 +172,7 @@
   window.Visuals = {
     mount(name, el, problem) {
       clearAnim();
-      const fn = this[name] || (problem && problem.sim ? this.sim : null);
+      const fn = this[name] || (problem && problem.figure ? this.explain : null) || (problem && problem.sim ? this.sim : null);
       if (!fn) {
         el.innerHTML = "<p class=\"viz-caption\">No figure for this problem yet.</p>";
         return;
