@@ -425,6 +425,22 @@
     });
   }
 
+  function toTop() {
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      html.style.scrollBehavior = prev;
+    });
+  }
+
+  function currentHash() {
+    const h = location.hash || "#home";
+    return (!h || h === "#") ? "#home" : h;
+  }
+
   function route() {
     const r = parseHash();
     if (r.view === "home") {
@@ -434,17 +450,26 @@
           const el = document.getElementById(r.scroll);
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         });
+      } else {
+        toTop();
       }
       return;
     }
     if (r.view === "catalog") {
       catalog.topic = r.topic || null;
       if (r.difficulty) catalog.difficulty = r.difficulty;
-      return renderCatalog(catalog.topic, catalog.difficulty);
+      renderCatalog(catalog.topic, catalog.difficulty);
+      toTop();
+      return;
     }
     const p = PROBLEMS.find((x) => x.id === r.id);
-    if (!p) return renderHome();
+    if (!p) {
+      renderHome();
+      toTop();
+      return;
+    }
     renderProblem(p);
+    toTop();
   }
 
   cmdkInput.addEventListener("input", () => {
@@ -455,6 +480,15 @@
   cmdk.querySelector("[data-close-search]").addEventListener("click", closeSearch);
   bindSearchButtons(document);
 
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  document.addEventListener("click", (ev) => {
+    const a = ev.target.closest('a[href="#home"], a[href="#catalog"]');
+    if (!a) return;
+    if (currentHash() === a.getAttribute("href")) {
+      ev.preventDefault();
+      toTop();
+    }
+  });
   window.addEventListener("hashchange", route);
   window.addEventListener("keydown", (ev) => {
     const metaK = (ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === "k";
