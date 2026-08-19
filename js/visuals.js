@@ -1,107 +1,10 @@
 (() => {
-  const stops = [];
-  const tweens = [];
+  const {
+    now, clamp, lerp, easeOut, easeInOut, easeOutBack,
+    startLoop, tween, wait, later, roundRect, drawCoin
+  } = window.Viz;
 
-  function now() { return performance.now(); }
-  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
-  function lerp(a, b, t) { return a + (b - a) * t; }
-  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-  function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-  function easeOutBack(t) {
-    const c1 = 1.70158;
-    const c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-
-  function startLoop(draw) {
-    let alive = true;
-    function tick(t) {
-      if (!alive) return;
-      for (let i = tweens.length - 1; i >= 0; i -= 1) {
-        if (!tweens[i].step(t)) tweens.splice(i, 1);
-      }
-      draw(t);
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-    stops.push(() => { alive = false; });
-  }
-
-  function tween(ms, update, done) {
-    const t0 = now();
-    return new Promise((resolve) => {
-      tweens.push({
-        step(t) {
-          const u = clamp((t - t0) / ms, 0, 1);
-          update(u);
-          if (u >= 1) {
-            if (done) done();
-            resolve();
-            return false;
-          }
-          return true;
-        }
-      });
-    });
-  }
-
-  function wait(ms) {
-    return tween(ms, () => {});
-  }
-
-  function clearAnim() {
-    while (stops.length) stops.pop()();
-    tweens.length = 0;
-  }
-
-  function later(fn, ms) {
-    const id = setTimeout(fn, ms);
-    stops.push(() => clearTimeout(id));
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    const rr = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.arcTo(x + w, y, x + w, y + h, rr);
-    ctx.arcTo(x + w, y + h, x, y + h, rr);
-    ctx.arcTo(x, y + h, x, y, rr);
-    ctx.arcTo(x, y, x + w, y, rr);
-    ctx.closePath();
-  }
-
-  function drawCoin(ctx, x, y, r, face, flip) {
-    const sy = Math.cos(flip * Math.PI);
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(1, Math.max(0.1, Math.abs(sy)));
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    const gold = ctx.createLinearGradient(-r, -r, r, r);
-    gold.addColorStop(0, "#f0d789");
-    gold.addColorStop(1, "#8a7030");
-    ctx.fillStyle = gold;
-    ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#f3efe4";
-    ctx.stroke();
-    ctx.fillStyle = "#0c1018";
-    ctx.font = "700 " + Math.round(r * 0.9) + "px 'Source Serif 4', serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(face, 0, 2);
-    ctx.restore();
-  }
-
-  window.Visuals = {
-    mount(name, el) {
-      clearAnim();
-      const fn = this[name];
-      if (!fn) return;
-      el.innerHTML = "";
-      fn.call(this, el);
-    },
-
+  Object.assign(window.Visuals, {
     hthhhh(root) {
       root.innerHTML = `
         <div class="viz-head">
@@ -1552,5 +1455,5 @@
       startLoop(draw);
       later(() => { playAll(); }, 450);
     }
-  };
+  });
 })();

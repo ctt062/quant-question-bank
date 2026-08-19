@@ -1,8 +1,24 @@
+window.TOPICS = [
+  { id: "probability", label: "Probability", blurb: "Waiting times, conditioning, and collectors." },
+  { id: "geometric", label: "Geometric probability", blurb: "Sticks, circles, chords, and needles." },
+  { id: "combinatorics", label: "Combinatorics", blurb: "Linearity, permutations, and counting." },
+  { id: "games", label: "Games and betting", blurb: "Cards, doors, patterns, and fortune." },
+  { id: "statistics", label: "Statistics", blurb: "Bayes, testing, and sampling." },
+  { id: "strategy", label: "Strategy", blurb: "Information and group strategies." }
+];
+
+window.DIFFICULTIES = [
+  { id: "easy", label: "Easy", hint: "Warm-up identities and one-picture arguments." },
+  { id: "medium", label: "Medium", hint: "A short derivation plus a mechanism to watch." },
+  { id: "hard", label: "Hard", hint: "Later-round classics. Time yourself." }
+];
+
 window.PROBLEMS = [
   {
     id: "hth-hhh",
     num: "01",
-    topic: "Probability",
+    topic: "probability",
+    difficulty: "hard",
     time: "10–15 min",
     title: "Waiting time for HTH vs HHH",
     blurb: "Same length, same coin, different expectations. The overlap structure is the whole point.",
@@ -64,7 +80,8 @@ window.PROBLEMS = [
   {
     id: "broken-stick",
     num: "02",
-    topic: "Geometric probability",
+    topic: "geometric",
+    difficulty: "hard",
     time: "8–12 min",
     title: "Broken stick forms a triangle",
     blurb: "Two uniform breaks on a unit stick. Triangle inequalities become a picture.",
@@ -106,7 +123,8 @@ window.PROBLEMS = [
   {
     id: "circle-cover",
     num: "03",
-    topic: "Geometric probability",
+    topic: "geometric",
+    difficulty: "hard",
     time: "12–15 min",
     title: "Covering the circle",
     blurb: "Throw uniform points on a circle until no open semicircle is empty.",
@@ -150,7 +168,8 @@ window.PROBLEMS = [
   {
     id: "prisoners",
     num: "04",
-    topic: "Strategy / information",
+    topic: "strategy",
+    difficulty: "hard",
     time: "12–15 min",
     title: "100 prisoners",
     blurb: "A permutation’s cycle structure turns an impossible search into a 31% shot.",
@@ -194,7 +213,8 @@ window.PROBLEMS = [
   {
     id: "multiple-testing",
     num: "05",
-    topic: "Statistics / inference",
+    topic: "statistics",
+    difficulty: "hard",
     time: "8–12 min",
     title: "Multiple testing and false discovery",
     blurb: "500 expected false positives, Bonferroni, and when FDR is the right control.",
@@ -245,7 +265,8 @@ window.PROBLEMS = [
   {
     id: "order-stats",
     num: "06",
-    topic: "Statistics / probability",
+    topic: "statistics",
+    difficulty: "hard",
     time: "8–10 min",
     title: "Uniform order-statistic means",
     blurb: "The k-th uniform order statistic is Beta. Its mean is the obvious spacing.",
@@ -276,7 +297,8 @@ window.PROBLEMS = [
   {
     id: "red-black",
     num: "07",
-    topic: "Cards / money",
+    topic: "games",
+    difficulty: "hard",
     time: "12–15 min",
     title: "Red-black even-money betting",
     blurb: "A fair deck, even odds, start with $1. You can lock a fortune that grows like the square root of the deck.",

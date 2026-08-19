@@ -1,33 +1,56 @@
-# Quant interview prep
+# Quant Interview Desk
 
-A local study desk for later-round quant interview problems: probability, strategy, and statistics.
+A static study desk for later-round quant interview problems.
 
-The first set is seven hard classics. Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
+Problems are grouped by topic (probability, geometric probability, combinatorics, games and betting, statistics, strategy) and by difficulty (easy, medium, hard). Each page hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
+
+Live site: [https://quant-interview-prep-neon.vercel.app](https://quant-interview-prep-neon.vercel.app)
 
 ## Run locally
 
-From this directory:
+```bash
+./serve.sh
+```
+
+Then open [http://127.0.0.1:8765](http://127.0.0.1:8765). Or:
 
 ```bash
 python3 -m http.server 8765
 ```
 
-Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
+No build step. The site is HTML, CSS, and JavaScript.
 
-The site is static HTML, CSS, and JavaScript. No build step.
+## Catalog
 
-## The hard set
+Twenty problems. Easy / medium / hard inside each topic.
 
-1. Waiting time for `HTH` vs `HHH`
-2. Broken stick forms a triangle
-3. Covering the circle (no empty semicircle)
-4. 100 prisoners
-5. Multiple testing: FWER vs FDR
-6. Uniform order-statistic expectations
-7. Red-black even-money betting
+| Topic | Easy | Medium | Hard |
+| --- | --- | --- | --- |
+| Probability | Waiting for the first six | Coupon collector | HTH vs HHH |
+| Geometric probability | Two points in the same half | Buffon's needle | Broken stick; covering the circle |
+| Combinatorics | Expected fixed points | Expected cycle count | Longest cycle past n/2 |
+| Games and betting | Monty Hall | Penney's game | Red-black even-money betting |
+| Statistics | Rare disease and a good test | Standard error of the mean | Multiple testing; uniform order stats |
+| Strategy | Three prisoners | Three hats | 100 prisoners |
 
-Work each problem for 8-15 minutes before opening the solution.
+Work each problem before opening the solution. A common first-pass for HTH is \(E[T]=8\); the linear system gives \(10\). A common first-pass for HTH beating HHH is \(2/3\); the race probability is \(3/5\).
 
-## Note on problem 1
+## Add a problem
 
-A common first-pass answer is \(E[T_{\mathrm{HTH}}]=8\). The linear system actually gives \(10\). The value \(8\) belongs to `HHT` / `HTT`, not `HTH`. The site derives both waiting times in full.
+Follow [skills/add-problem/SKILL.md](skills/add-problem/SKILL.md). Agents should start at [AGENTS.md](AGENTS.md).
+
+Short version: derive the answer, add a `String.raw` record with `topic` and `difficulty`, register a canvas figure on `window.Visuals`, never put raw `<` inside math.
+
+## Deploy
+
+Static hosting. [Vercel](https://vercel.com) is configured via `vercel.json`. From this directory, after `vercel login`:
+
+```bash
+npx vercel --prod
+```
+
+Or connect the GitHub repo to a Vercel project so pushes to `main` deploy.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
