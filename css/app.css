@@ -507,19 +507,21 @@ body[data-view="problem"] .site-foot { display: none; }
 .foot-inner { max-width: var(--max); margin: 0 auto; display: grid; gap: 18px; }
 .foot-inner strong { color: var(--paper); font-family: var(--serif); font-size: 18px; }
 .foot-inner p { margin: 6px 0 0; }
-.foot-inner div:nth-child(2) { display: flex; gap: 16px; }
 .foot-meta { font-size: 12px; font-family: var(--mono); }
 .gh-repo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   width: fit-content;
-  padding: 10px 14px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid var(--line-strong);
   background: var(--panel);
   color: var(--gold);
-  font-family: var(--mono);
-  font-size: 13px;
+  font-size: 22px;
+  line-height: 1;
   text-decoration: none;
 }
 .gh-repo:hover { border-color: var(--gold); text-decoration: none; }
