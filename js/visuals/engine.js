@@ -13,6 +13,10 @@
     return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
   }
 
+  function prefersReducedMotion() {
+    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
   function startLoop(draw) {
     let alive = true;
     function tick(t) {
@@ -28,6 +32,11 @@
   }
 
   function tween(ms, update, done) {
+    if (prefersReducedMotion()) {
+      update(1);
+      if (done) done();
+      return Promise.resolve();
+    }
     const t0 = now();
     return new Promise((resolve) => {
       tweens.push({
@@ -169,6 +178,27 @@
     shuffle, harmonic, clearAnim
   };
 
+  function describeFigure(el, problem) {
+    const canvas = el.querySelector("canvas");
+    if (!canvas) return;
+    const head = el.querySelector(".viz-head h3");
+    const cap = el.querySelector(".viz-caption");
+    const pid = (problem && problem.id) || "figure";
+    const title = ((head && head.textContent) || (problem && problem.title) || "Figure").trim();
+    const caption = ((cap && cap.textContent) || "").trim();
+    const alt = [title, caption].filter(Boolean).join(". ");
+    if (head) {
+      head.id = "viz-title-" + pid;
+      canvas.setAttribute("aria-labelledby", head.id);
+    }
+    if (cap) {
+      cap.id = "viz-cap-" + pid;
+      canvas.setAttribute("aria-describedby", cap.id);
+    }
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", alt);
+  }
+
   window.Visuals = {
     mount(name, el, problem) {
       clearAnim();
@@ -179,6 +209,7 @@
       }
       el.innerHTML = "";
       fn.call(this, el, problem);
+      describeFigure(el, problem);
     }
   };
 })();

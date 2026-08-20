@@ -7,7 +7,7 @@ Read this file before changing the catalog, figures, or public copy. For a new p
 ## Product
 
 - One-page static site. No bundler, no backend, no environment variables.
-- Hash routes: `#home`, `#catalog`, `#cat/<topic>`, `#diff/<easy|medium|hard>`, `#<problem-id>`.
+- Hash routes: `#home`, `#catalog`, `#cat/<topic>`, `#diff/<easy|medium|hard>`, `#practice`, `#practice/continue`, `#practice/hard`, `#practice/timed`, `#practice/mock`, `#practice/topic/<topic>`, `#<problem-id>`.
 - Global search opens with Command+K (Ctrl+K on Windows/Linux).
 - Solutions stay hidden until the reader reveals them.
 - Every problem has a derived solution and a playable figure.
@@ -50,6 +50,10 @@ Shared animation helpers are `js/visuals/engine.js` (`window.Viz`). Existing har
 A figure should make the argument visible: a sample space, a payoff matrix, a graph, a stick, a permutation. Do not attach a running-mean Monte Carlo that only restates the number. Use `New sample` when a fresh draw helps; omit it on static diagrams.
 
 Register new scripts in `index.html` after `engine.js` and before `app.js`.
+
+## Checks
+
+`npm test` validates catalog schema (including duplicate ids) and runs Playwright against hash routes, search, solution reveal, notes, and figure mount. Keep the site static. Do not add a bundler, backend, or environment variables.
 
 ## Public-facing files
 
