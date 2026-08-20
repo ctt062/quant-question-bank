@@ -21,7 +21,9 @@
   });
   document.querySelectorAll(".search-launch kbd, .search-hero kbd").forEach((el) => { el.textContent = kbdChord; });
 
-  const state = load() || {
+  const stored = load();
+  const migrateSeen = stored != null && !Object.prototype.hasOwnProperty.call(stored, "status");
+  const state = stored || {
     notes: {},
     seen: {},
     status: {},
@@ -32,9 +34,11 @@
   if (!state.notes) state.notes = {};
   if (!state.seen) state.seen = {};
   if (!state.status) state.status = {};
-  Object.keys(state.seen).forEach((id) => {
-    if (state.seen[id] && !state.status[id]) state.status[id] = "attempted";
-  });
+  if (migrateSeen) {
+    Object.keys(state.seen).forEach((id) => {
+      if (state.seen[id] && !state.status[id]) state.status[id] = "attempted";
+    });
+  }
   state.timer = state.timer || { remain: 12 * 60, running: false };
   state.timer.running = false;
   state.timer.id = null;
@@ -80,16 +84,20 @@
     return a;
   }
 
-  function weightedPool(list) {
+  function partitionPool(list) {
     const revisit = list.filter((p) => getStatus(p.id) === "revisit");
     const unseen = list.filter((p) => !getStatus(p.id));
     const attempted = list.filter((p) => getStatus(p.id) === "attempted");
-    const pool = revisit.concat(unseen, attempted);
-    return pool.length ? pool : list.slice();
+    const confident = list.filter((p) => getStatus(p.id) === "confident");
+    return { preferred: revisit.concat(unseen, attempted), rest: confident };
   }
 
   function pickN(list, n) {
-    return shuffle(weightedPool(list)).slice(0, Math.max(1, n));
+    const want = Math.max(1, n);
+    const { preferred, rest } = partitionPool(list);
+    const picked = shuffle(preferred);
+    if (picked.length >= want) return picked.slice(0, want);
+    return picked.concat(shuffle(rest).slice(0, want - picked.length));
   }
 
   function progress() {
@@ -123,19 +131,24 @@
   function pickMock() {
     const chosen = [];
     const usedTopics = new Set();
-    function take(diff, n) {
-      const ordered = shuffle(weightedPool(PROBLEMS.filter((p) => p.difficulty === diff)));
+    function take(from, n) {
+      const ordered = shuffle(from);
       ordered.sort((a, b) => Number(usedTopics.has(a.topic)) - Number(usedTopics.has(b.topic)));
       for (const p of ordered) {
-        if (chosen.filter((x) => x.difficulty === diff).length >= n) break;
+        if (chosen.filter((x) => x.difficulty === p.difficulty).length >= n) break;
         if (chosen.some((x) => x.id === p.id)) continue;
         chosen.push(p);
         usedTopics.add(p.topic);
       }
     }
-    take("easy", 1);
-    take("medium", 2);
-    take("hard", 2);
+    function takeDiff(diff, n) {
+      const { preferred, rest } = partitionPool(PROBLEMS.filter((p) => p.difficulty === diff));
+      take(preferred, n);
+      take(rest, n);
+    }
+    takeDiff("easy", 1);
+    takeDiff("medium", 2);
+    takeDiff("hard", 2);
     return shuffle(chosen);
   }
 
@@ -396,20 +409,20 @@
       if (!queue.length) {
         state.session = null;
         save();
-        location.hash = "practice";
+        location.replace("#practice");
         return;
       }
       ids = queue.slice(0, 8).map((p) => p.id);
       title = "Continue practicing";
     }
     if (!ids.length) {
-      location.hash = "practice";
+      location.replace("#practice");
       return;
     }
     state.session = { kind, title, ids, index: 0, topic: topic || null, perProblemSec, totalRemain };
     state.recap = null;
     save();
-    location.hash = ids[0];
+    location.replace("#" + ids[0]);
   }
 
   function endSession(complete) {
@@ -450,6 +463,7 @@
   function startSessionClock(el) {
     stopSessionClock();
     if (!state.session || typeof state.session.totalRemain !== "number") return;
+    if (state.session.totalRemain <= 0) return;
     sessionTick = setInterval(() => {
       if (!state.session || typeof state.session.totalRemain !== "number") {
         stopSessionClock();
@@ -460,6 +474,7 @@
         el.textContent = fmt(state.session.totalRemain);
         el.classList.toggle("warn", state.session.totalRemain <= 60);
       }
+      if (state.session.totalRemain <= 0) stopSessionClock();
       save();
     }, 1000);
   }
