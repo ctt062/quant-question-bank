@@ -30,7 +30,7 @@ Existing hard-set answers must not change:
 
 Each record in `js/problems.js`, `js/problems-more.js`, or `js/problems-fill-*.js` needs:
 
-- `id` - stable hash fragment
+- `id` - stable hash fragment that must not collide with reserved routes (`home`, `catalog`, `topics`, `practice`, `cat`, `diff`)
 - `topic` - one of `probability`, `geometric`, `combinatorics`, `games`, `statistics`, `strategy`
 - `difficulty` - `easy` | `medium` | `hard`
 - `time`, `title`, `blurb`
@@ -53,7 +53,7 @@ Register new scripts in `index.html` after `engine.js` and before `app.js`.
 
 ## Checks
 
-`npm test` validates catalog schema (including duplicate ids) and runs Playwright against hash routes, search, solution reveal, notes, and figure mount. Keep the site static. Do not add a bundler, backend, or environment variables.
+`npm test` validates catalog schema (unique ids, reserved hash fragments, required fields) and runs Playwright against every hash route, search, solution reveal, notes, and figure mount.
 
 ## Public-facing files
 

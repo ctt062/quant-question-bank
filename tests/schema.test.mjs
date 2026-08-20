@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { loadCatalog, validateCatalog } from "../scripts/validate-catalog.mjs";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const baseProblem = {
   id: "sample-id",
@@ -62,4 +67,13 @@ test("explain visual requires figure.kind", () => {
   });
   assert.equal(result.ok, false);
   assert.ok(result.errors.some((e) => /figure\.kind/i.test(e)));
+});
+
+test("vercel skips install and build so Playwright stays off deploy", () => {
+  const vercel = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
+  assert.equal(vercel.installCommand, "echo skip");
+  assert.equal(vercel.buildCommand, "echo skip");
+  const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
+  assert.equal(pkg.scripts.build, undefined);
+  assert.deepEqual(pkg.dependencies || {}, {});
 });

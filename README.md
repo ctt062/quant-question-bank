@@ -6,7 +6,7 @@ A public desk of later-round quant interview problems: probability, geometry, co
 
 Each problem hides the solution until you reveal it, includes a timer, and has an interactive figure so you can see the mechanism instead of only reading algebra.
 
-Statuses (attempted, confident, revisit), notes, and practice sessions stay in this browser. Continue practicing walks the review queue. Random hard, timed sets, topic drills, and mixed mock interviews live at `#practice`.
+Statuses (attempted, confident, revisit), notes, and practice sessions stay in this browser. Progress appears on home and on `#practice`. Continue practicing walks revisit, then unseen, then attempted. Random hard, timed sets, topic drills, and mixed mock interviews live at `#practice`.
 
 Use it at [https://quant-question-bank.vercel.app](https://quant-question-bank.vercel.app). Search from the header or with Command+K (Ctrl+K on Windows/Linux).
 
@@ -26,7 +26,7 @@ Pull requests should say which answers you derived and how you checked the figur
 
 ### Checks
 
-`npm test` validates the catalog schema (unique ids, required fields) and runs Playwright against every hash route, search, solution reveal, note persistence, and figure mount.
+`npm test` validates the catalog and runs the browser checks. Details live in [AGENTS.md](AGENTS.md).
 
 The site itself stays static. `package.json` is only for those checks. Vercel skips install and build.
 
