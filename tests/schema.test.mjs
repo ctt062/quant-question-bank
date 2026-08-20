@@ -73,6 +73,7 @@ test("vercel skips install and build so Playwright stays off deploy", () => {
   const vercel = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
   assert.equal(vercel.installCommand, "echo skip");
   assert.equal(vercel.buildCommand, "echo skip");
+  assert.equal(vercel.outputDirectory, ".");
   const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
   assert.equal(pkg.scripts.build, undefined);
   assert.deepEqual(pkg.dependencies || {}, {});
