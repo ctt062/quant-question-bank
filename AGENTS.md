@@ -7,6 +7,7 @@ Read this file before changing the catalog, figures, or public copy. For a new p
 ## Product
 
 - One-page static site. No bundler, no backend, no environment variables.
+- Live site: `https://quant-question-bank.vercel.app`. The Vercel project is `quant-question-bank`. Do not create, link, or deploy a `quant-interview-prep` project.
 - Hash routes: `#home`, `#catalog`, `#cat/<topic>`, `#diff/<easy|medium|hard>`, `#practice`, `#practice/continue`, `#practice/hard`, `#practice/timed`, `#practice/mock`, `#practice/topic/<topic>`, `#<problem-id>`.
 - Global search opens with Command+K (Ctrl+K on Windows/Linux).
 - Solutions stay hidden until the reader reveals them.
@@ -58,6 +59,8 @@ Register new scripts in `index.html` after `engine.js` and before `app.js`.
 ## Public-facing files
 
 Keep `README.md` accurate: what the desk is, the live URL, how to add a problem, license. Do not vendor secrets.
+
+`.vercel/project.json` pins deploys to project `quant-question-bank`. Do not retarget it.
 
 ## Git
 

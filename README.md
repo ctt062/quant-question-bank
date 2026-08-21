@@ -28,7 +28,7 @@ Pull requests should say which answers you derived and how you checked the figur
 
 `npm test` validates the catalog and runs the browser checks. Details live in [AGENTS.md](AGENTS.md).
 
-The site itself stays static. `package.json` is only for those checks. Vercel skips install and build.
+The site itself stays static. `package.json` is only for those checks. Vercel skips install and build. Deploys go to the `quant-question-bank` Vercel project at the URL above, not to any `quant-interview-prep` project.
 
 ## License
 
