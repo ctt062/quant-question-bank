@@ -1,6 +1,9 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "installCommand": "echo skip",
+  "buildCommand": "echo skip",
+  "outputDirectory": ".",
   "headers": [
     {
       "source": "/index.html",
