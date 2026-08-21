@@ -2,7 +2,8 @@
 *.swp
 .idea/
 .vscode/
-.vercel
+.vercel/*
+!.vercel/project.json
 .env*
 node_modules/
 playwright-report/
