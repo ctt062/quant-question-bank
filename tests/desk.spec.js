@@ -124,6 +124,26 @@ test("practice modes start sessions", async ({ page }) => {
   await expect(page.locator(".session-bar")).toContainText("Probability drill");
 });
 
+test("logo is home and hero actions match search", async ({ page }) => {
+  await page.goto("/#catalog");
+  await expect(page.locator("#primary-nav")).not.toContainText("Home");
+  await expect(page.locator(".brand")).toHaveAttribute("aria-label", "Home");
+  await page.locator(".brand").click();
+  await expect(page.locator(".hero-home h1")).toBeVisible();
+
+  const search = page.locator(".search-hero");
+  const catalog = page.locator('.hero-launch a[href="#catalog"]');
+  const practice = page.locator('.hero-launch a[href="#practice"]');
+  const s = await search.boundingBox();
+  const c = await catalog.boundingBox();
+  const p = await practice.boundingBox();
+  expect(s && c && p).toBeTruthy();
+  expect(Math.abs(c.height - s.height)).toBeLessThan(2);
+  expect(Math.abs(p.height - s.height)).toBeLessThan(2);
+  expect(Math.abs(c.x - s.x)).toBeLessThan(2);
+  expect(Math.abs((p.x + p.width) - (s.x + s.width))).toBeLessThan(2);
+});
+
 test("mobile nav keeps catalog reachable", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#home");

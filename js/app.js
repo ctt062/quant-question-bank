@@ -262,8 +262,10 @@
           <h1>Later-round problems, with the mechanism in view.</h1>
           <p class="lede">Probability, geometry, combinatorics, games, statistics, and strategy. Time yourself, write a setup, then reveal a derived solution and play the figure.</p>
           <div class="hero-actions">
-            <a class="btn primary" href="#catalog">Browse the catalog</a>
-            <a class="btn" href="#practice">Practice desk</a>
+            <div class="hero-launch">
+              <a class="btn primary" href="#catalog">Browse the catalog</a>
+              <a class="btn" href="#practice">Practice desk</a>
+            </div>
             <button class="search-hero" type="button" data-open-search aria-expanded="false" aria-haspopup="dialog" aria-controls="cmdk">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
